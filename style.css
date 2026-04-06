@@ -630,6 +630,43 @@ body {
   flex-shrink: 0;
 }
 
+/* --- Follow-up Chips --- */
+.followups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0 8px;
+  animation: fadeUp 0.3s ease;
+}
+
+.followup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.followup-chip:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.followup-icon {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
 /* --- Animations --- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }

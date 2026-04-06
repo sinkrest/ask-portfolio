@@ -10,6 +10,29 @@ const state = {
   theme: localStorage.getItem('amp-theme') || 'dark',
 };
 
+const FOLLOW_UPS = [
+  [
+    { icon: '\u25B7', text: 'Tell me about the Ghost Creator Suite', question: 'Tell me about the Ghost Creator Suite — 7 tools in 2 weeks' },
+    { icon: '\u2726', text: 'Walk me through a case study', question: 'Walk me through the AI children\'s book case study' },
+    { icon: '\u2699', text: 'What are his AI skills?', question: 'What are Roman\'s AI and technical skills?' },
+  ],
+  [
+    { icon: '\u25C8', text: 'How does he approach PM?', question: 'How does Roman approach product management?' },
+    { icon: '\u2605', text: 'What has he shipped?', question: 'What products has Roman shipped to real customers?' },
+    { icon: '\u2794', text: 'Why hire Roman?', question: 'Why should we hire Roman for an AI product role?' },
+  ],
+  [
+    { icon: '\u25B7', text: 'Tell me about the scoping tool', question: 'Walk me through the AI Implementation Scoping Tool case study' },
+    { icon: '\u2726', text: 'What makes him different?', question: 'What makes Roman different from other PM candidates?' },
+    { icon: '\u2699', text: 'What is his background?', question: 'What is Roman\'s career background and education?' },
+  ],
+  [
+    { icon: '\u25C8', text: 'Ghost PM Signal case study', question: 'Tell me about the Ghost PM Signal dashboard — how does it work?' },
+    { icon: '\u2605', text: 'His product philosophy', question: 'What is Roman\'s product philosophy and working style?' },
+    { icon: '\u2794', text: 'Manufacturing + AI?', question: 'How does Roman\'s manufacturing background help in AI product work?' },
+  ],
+];
+
 // --- DOM Elements ---
 const hero = document.getElementById('hero');
 const suggestions = document.getElementById('suggestions');
@@ -36,7 +59,6 @@ function applyTheme(theme) {
   state.theme = theme;
   localStorage.setItem('amp-theme', theme);
 
-  // Swap icon
   if (theme === 'light') {
     themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   } else {
@@ -63,7 +85,6 @@ function renderKnowledgeList() {
 }
 
 function setupListeners() {
-  // Send message
   sendBtn.addEventListener('click', () => handleSend());
 
   inputTextarea.addEventListener('keydown', (e) => {
@@ -73,10 +94,9 @@ function setupListeners() {
     }
   });
 
-  // Auto-resize textarea
   inputTextarea.addEventListener('input', () => autoResize());
 
-  // Suggested questions
+  // Suggested questions (initial)
   document.querySelectorAll('.suggestion-card').forEach(card => {
     card.addEventListener('click', () => {
       const q = card.getAttribute('data-question');
@@ -84,12 +104,10 @@ function setupListeners() {
     });
   });
 
-  // Theme toggle
   themeToggle.addEventListener('click', () => {
     applyTheme(state.theme === 'dark' ? 'light' : 'dark');
   });
 
-  // Modal
   infoBtn.addEventListener('click', () => modalOverlay.classList.add('visible'));
   modalClose.addEventListener('click', () => modalOverlay.classList.remove('visible'));
   modalOverlay.addEventListener('click', (e) => {
@@ -113,11 +131,18 @@ async function sendMessage(text) {
   state.isStreaming = true;
   sendBtn.disabled = true;
 
-  // Collapse hero on first message
+  // Remove any existing follow-up chips
+  document.querySelectorAll('.followups').forEach(el => el.remove());
+
+  // Collapse hero on first message — lock scroll position to prevent jump
   if (!state.hasStarted) {
     state.hasStarted = true;
+    const scrollY = window.scrollY;
+    const heroHeight = hero.offsetHeight + suggestions.offsetHeight;
     hero.classList.add('collapsed');
     suggestions.classList.add('hidden');
+    // Compensate: shift scroll up by the height removed
+    window.scrollTo(0, Math.max(0, scrollY - heroHeight));
   }
 
   // Clear input
@@ -132,8 +157,6 @@ async function sendMessage(text) {
 
   // Show typing
   const typingEl = showTyping();
-
-  // Scroll
   scrollToBottom();
 
   try {
@@ -141,18 +164,19 @@ async function sendMessage(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: state.messages.slice(0, -1), // Prior history
+        messages: state.messages.slice(0, -1),
         question: text,
       }),
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Request failed');
+      let errMsg = 'Request failed';
+      try { const err = await res.json(); errMsg = err.error || errMsg; } catch(e) {}
+      throw new Error(errMsg);
     }
 
     // Remove typing indicator
-    typingEl.remove();
+    if (typingEl.parentNode) typingEl.remove();
 
     // Process stream
     const reader = res.body.getReader();
@@ -192,11 +216,9 @@ async function sendMessage(text) {
           }
 
           if (event.type === 'done') {
-            // Render citations
             if (assistantEl && sourceMeta.length > 0) {
               renderSourceCards(assistantEl, sourceMeta, fullText);
             }
-            // Add to history
             state.messages.push({ role: 'assistant', content: fullText });
           }
         } catch (e) {
@@ -205,14 +227,81 @@ async function sendMessage(text) {
       }
     }
 
-  } catch (err) {
-    typingEl.remove();
-    renderErrorMessage(err.message || 'Something went wrong. Try again.');
-  }
+    // Process any remaining buffer
+    if (buffer.trim()) {
+      try {
+        const remaining = buffer.trim();
+        if (remaining.startsWith('data: ')) {
+          const event = JSON.parse(remaining.slice(6).trim());
+          if (event.type === 'text' && assistantEl) {
+            fullText += event.text;
+            renderAssistantContent(assistantEl, fullText);
+          }
+          if (event.type === 'done') {
+            if (assistantEl && sourceMeta.length > 0) {
+              renderSourceCards(assistantEl, sourceMeta, fullText);
+            }
+            if (!state.messages.find(m => m.content === fullText && m.role === 'assistant')) {
+              state.messages.push({ role: 'assistant', content: fullText });
+            }
+          }
+        }
+      } catch(e) {}
+    }
 
-  state.isStreaming = false;
-  sendBtn.disabled = false;
-  inputTextarea.focus();
+    // Safety: if assistant text was received but 'done' event was missed, still save it
+    if (fullText && !state.messages.find(m => m.content === fullText && m.role === 'assistant')) {
+      if (assistantEl && sourceMeta.length > 0) {
+        renderSourceCards(assistantEl, sourceMeta, fullText);
+      }
+      state.messages.push({ role: 'assistant', content: fullText });
+    }
+
+    // Show follow-up suggestions
+    renderFollowUps();
+
+  } catch (err) {
+    if (typingEl.parentNode) typingEl.remove();
+    renderErrorMessage(err.message || 'Something went wrong. Try again.');
+  } finally {
+    // Always reset — never leave streaming stuck
+    state.isStreaming = false;
+    sendBtn.disabled = false;
+    inputTextarea.focus();
+    scrollToBottom();
+  }
+}
+
+// --- Follow-up Suggestions ---
+function renderFollowUps() {
+  // Pick a set based on how many exchanges we've had, cycle through
+  const turn = Math.floor((state.messages.length - 1) / 2);
+  const set = FOLLOW_UPS[turn % FOLLOW_UPS.length];
+
+  // Filter out questions already asked
+  const asked = new Set(state.messages.filter(m => m.role === 'user').map(m => m.content.toLowerCase()));
+  const available = set.filter(f => !asked.has(f.question.toLowerCase()));
+  if (available.length === 0) return;
+
+  const div = document.createElement('div');
+  div.className = 'followups';
+  div.innerHTML = available.map(f =>
+    `<button class="followup-chip" data-question="${escapeAttr(f.question)}">
+      <span class="followup-icon">${f.icon}</span> ${escapeHtml(f.text)}
+    </button>`
+  ).join('');
+
+  messagesEl.appendChild(div);
+
+  // Attach click handlers
+  div.querySelectorAll('.followup-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const q = btn.getAttribute('data-question');
+      if (q && !state.isStreaming) sendMessage(q);
+    });
+  });
+
+  scrollToBottom();
 }
 
 // --- Rendering Functions ---
@@ -235,13 +324,11 @@ function createAssistantMessage() {
 
 function renderAssistantContent(el, text) {
   const contentEl = el.querySelector('.message-assistant-content');
-  // Convert citation references [1], [2] to clickable badges
   const processed = text.replace(/\[(\d+)\]/g, '<span class="citation-badge" data-ref="$1">$1</span>');
   contentEl.innerHTML = marked.parse(processed);
 }
 
 function renderSourceCards(el, sources, fullText) {
-  // Only show sources that were actually cited
   const citedNumbers = new Set();
   const matches = fullText.matchAll(/\[(\d+)\]/g);
   for (const m of matches) citedNumbers.add(parseInt(m[1]));
@@ -301,6 +388,10 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // --- Start ---
