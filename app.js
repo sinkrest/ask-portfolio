@@ -328,6 +328,20 @@ function renderAssistantContent(el, text) {
   contentEl.innerHTML = marked.parse(processed);
 }
 
+// Map source titles to useful follow-up questions
+const SOURCE_QUESTIONS = {
+  'About Roman Martins': 'Tell me more about Roman\'s background and career journey',
+  'Professional Experience': 'Walk me through Roman\'s professional experience in detail',
+  'Skills & Technical Capabilities': 'What are Roman\'s strongest technical and PM skills?',
+  'Portfolio — Live Deployed Tools': 'Show me the full list of tools Roman has built',
+  'Ghost Creator Suite — 7 Tools in 2 Weeks': 'Tell me the story behind the Ghost Creator Suite',
+  'Product Philosophy & Approach': 'How does Roman approach product management and AI?',
+  'Thought Leadership & Writing': 'What does Roman write about and what are his key insights?',
+  'Case Study — AI Children\'s Book Platform': 'Walk me through the AI children\'s book case study',
+  'Case Study — AI Implementation Scoping Tool': 'Tell me about the AI Scoping Tool and its prompt architecture',
+  'Case Study — Ghost PM Signal': 'How does Ghost PM Signal work and what problem does it solve?',
+};
+
 function renderSourceCards(el, sources, fullText) {
   const citedNumbers = new Set();
   const matches = fullText.matchAll(/\[(\d+)\]/g);
@@ -342,19 +356,38 @@ function renderSourceCards(el, sources, fullText) {
     <div class="sources-label">Sources</div>
     <div class="sources-grid">
       ${cited.map(s => {
-        const href = s.url || '#';
-        const target = s.url ? ' target="_blank" rel="noopener"' : '';
-        return `
-          <a class="source-card" href="${href}"${target}>
-            <span class="source-card-number">[${s.index}]</span>
-            <span class="source-card-title">${escapeHtml(s.title)}</span>
-            ${s.url ? '<span class="source-card-arrow">&nearr;</span>' : ''}
-          </a>
-        `;
+        if (s.url) {
+          // External link — opens in new tab
+          return `
+            <a class="source-card" href="${s.url}" target="_blank" rel="noopener">
+              <span class="source-card-number">[${s.index}]</span>
+              <span class="source-card-title">${escapeHtml(s.title)}</span>
+              <span class="source-card-arrow">&nearr;</span>
+            </a>
+          `;
+        } else {
+          // No URL — clickable to ask a follow-up about this source
+          const followUp = SOURCE_QUESTIONS[s.title] || `Tell me more about: ${s.title}`;
+          return `
+            <button class="source-card source-card-askable" data-question="${escapeAttr(followUp)}">
+              <span class="source-card-number">[${s.index}]</span>
+              <span class="source-card-title">${escapeHtml(s.title)}</span>
+              <span class="source-card-arrow source-card-dive">&darr;</span>
+            </button>
+          `;
+        }
       }).join('')}
     </div>
   `;
   el.appendChild(container);
+
+  // Attach click handlers for askable source cards
+  container.querySelectorAll('.source-card-askable').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const q = btn.getAttribute('data-question');
+      if (q && !state.isStreaming) sendMessage(q);
+    });
+  });
 }
 
 function renderErrorMessage(text) {

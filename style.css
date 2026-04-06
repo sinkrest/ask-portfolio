@@ -432,6 +432,19 @@ body {
   margin-left: auto;
 }
 
+.source-card-askable {
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.source-card-askable:hover .source-card-dive {
+  color: var(--accent-text);
+}
+
+.source-card-dive {
+  transition: color 0.15s;
+}
+
 /* --- Typing Indicator --- */
 .typing {
   display: flex;
