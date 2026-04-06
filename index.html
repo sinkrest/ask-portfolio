@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask My Portfolio — Roman Martins</title>
+  <meta name="description" content="Ask questions about Roman Martins' AI product portfolio. Powered by RAG + Claude.">
+  <meta property="og:title" content="Ask My Portfolio — Roman Martins">
+  <meta property="og:description" content="Conversational portfolio powered by RAG. Ask anything about Roman's AI product work.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-dot"></div>
+      <span class="header-title">Ask My Portfolio</span>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" id="themeToggle" title="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="header-btn" id="infoBtn" title="About this tool">?</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero-avatar">RM</div>
+      <h1 class="hero-name">Roman Martins</h1>
+      <p class="hero-tagline">AI Product Leader who actually builds.<br>Ask me anything about his work.</p>
+      <p class="hero-question">What would you like to know?</p>
+    </section>
+
+    <!-- Suggested Questions -->
+    <div class="suggestions" id="suggestions">
+      <div class="suggestion-card" data-question="What has Roman built?">
+        <span class="suggestion-icon">&#9655;</span>
+        <span class="suggestion-text">What has Roman built?</span>
+      </div>
+      <div class="suggestion-card" data-question="Tell me about the Ghost Creator Suite — 7 tools in 2 weeks">
+        <span class="suggestion-icon">&#9830;</span>
+        <span class="suggestion-text">Tell me about the Ghost Creator Suite</span>
+      </div>
+      <div class="suggestion-card" data-question="What are Roman's AI and technical skills?">
+        <span class="suggestion-icon">&#9881;</span>
+        <span class="suggestion-text">What are his AI and technical skills?</span>
+      </div>
+      <div class="suggestion-card" data-question="How does Roman approach product management?">
+        <span class="suggestion-icon">&#9672;</span>
+        <span class="suggestion-text">How does he approach product management?</span>
+      </div>
+      <div class="suggestion-card" data-question="Walk me through the AI children's book case study">
+        <span class="suggestion-icon">&#9733;</span>
+        <span class="suggestion-text">Walk me through a case study</span>
+      </div>
+      <div class="suggestion-card" data-question="Why should we hire Roman for an AI product role?">
+        <span class="suggestion-icon">&#10148;</span>
+        <span class="suggestion-text">Why should we hire Roman?</span>
+      </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="messages" id="messages"></div>
+  </main>
+
+  <!-- Input Bar -->
+  <div class="input-container">
+    <div class="input-wrapper">
+      <textarea
+        class="input-textarea"
+        id="inputTextarea"
+        placeholder="Ask anything about Roman..."
+        rows="1"
+      ></textarea>
+      <button class="send-btn" id="sendBtn" title="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Powered by RAG + <a href="https://anthropic.com" target="_blank" rel="noopener">Claude</a> · <a href="https://romanmartins.com" target="_blank" rel="noopener">romanmartins.com</a>
+  </div>
+
+  <!-- Info Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>About This Tool</h2>
+      <p>This is a <strong>RAG-powered conversational portfolio</strong>. It answers questions about Roman Martins using a curated knowledge base of his professional work — CV, case studies, portfolio tools, and product philosophy.</p>
+      <p>Every answer is grounded in source documents, shown as numbered citations. No information is fabricated.</p>
+      <p><strong>Knowledge base includes:</strong></p>
+      <ul class="knowledge-list" id="knowledgeList">
+        <li>Loading...</li>
+      </ul>
+      <p style="font-size: 12px; color: var(--text-tertiary);">Built with Claude API + Vercel. Source knowledge is curated markdown — easily updated.</p>
+      <button class="modal-close" id="modalClose">Got it</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
