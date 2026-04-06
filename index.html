@@ -30,10 +30,13 @@
   <main class="main">
     <!-- Hero -->
     <section class="hero" id="hero">
-      <div class="hero-avatar">RM</div>
+      <img class="hero-photo" src="roman-martins.jpg" alt="Roman Martins" />
       <h1 class="hero-name">Roman Martins</h1>
-      <p class="hero-tagline">AI Product Leader who actually builds.<br>Ask me anything about his work.</p>
-      <p class="hero-question">What would you like to know?</p>
+      <p class="hero-tagline">AI Product Leader who actually builds.</p>
+      <div class="jarvi-intro">
+        <div class="jarvi-badge">J</div>
+        <p class="jarvi-text">Hi, I'm <strong>Jarvi</strong> — Roman's AI assistant. I know his work inside out. Ask me anything.</p>
+      </div>
     </section>
 
     <!-- Suggested Questions -->
@@ -74,7 +77,7 @@
       <textarea
         class="input-textarea"
         id="inputTextarea"
-        placeholder="Ask anything about Roman..."
+        placeholder="Ask Jarvi anything about Roman..."
         rows="1"
       ></textarea>
       <button class="send-btn" id="sendBtn" title="Send message">
@@ -91,9 +94,9 @@
   <!-- Info Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h2>About This Tool</h2>
-      <p>This is a <strong>RAG-powered conversational portfolio</strong>. It answers questions about Roman Martins using a curated knowledge base of his professional work — CV, case studies, portfolio tools, and product philosophy.</p>
-      <p>Every answer is grounded in source documents, shown as numbered citations. No information is fabricated.</p>
+      <h2>Meet Jarvi</h2>
+      <p><strong>Jarvi</strong> is Roman's AI assistant — a RAG-powered conversational portfolio. Jarvi answers questions about Roman using a curated knowledge base of his professional work: CV, case studies, portfolio tools, and product philosophy.</p>
+      <p>Every answer is grounded in source documents, shown as numbered citations. Nothing is fabricated.</p>
       <p><strong>Knowledge base includes:</strong></p>
       <ul class="knowledge-list" id="knowledgeList">
         <li>Loading...</li>

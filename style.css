@@ -190,19 +190,49 @@ body {
   pointer-events: none;
 }
 
-.hero-avatar {
-  width: 72px;
-  height: 72px;
+.hero-photo {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  box-shadow: 0 0 0 3px var(--bg-primary), 0 0 0 4px var(--border);
+}
+
+.jarvi-intro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 14px 18px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  max-width: 420px;
+}
+
+.jarvi-badge {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 14px;
   font-weight: 700;
   color: white;
-  margin-bottom: 20px;
-  box-shadow: 0 0 0 4px var(--bg-primary), 0 0 0 5px var(--border);
+  flex-shrink: 0;
+}
+
+.jarvi-text {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.jarvi-text strong {
+  color: var(--text-primary);
 }
 
 .hero-name {
@@ -307,6 +337,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding-left: 36px;
+  position: relative;
+}
+
+.message-assistant .jarvi-msg-avatar {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
 }
 
 .message-assistant-content {

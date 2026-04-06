@@ -315,6 +315,10 @@ function renderUserMessage(text) {
 function createAssistantMessage() {
   const div = document.createElement('div');
   div.className = 'message message-assistant';
+  const avatar = document.createElement('div');
+  avatar.className = 'jarvi-msg-avatar';
+  avatar.textContent = 'J';
+  div.appendChild(avatar);
   const content = document.createElement('div');
   content.className = 'message-assistant-content';
   div.appendChild(content);
