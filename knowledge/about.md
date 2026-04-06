@@ -22,6 +22,10 @@ Roman's career spans three distinct chapters:
 
 Roman sits at the intersection of deep technical understanding and product strategy. While most PMs talk about AI strategy, he ships Claude API tools, designs prompt architectures, and runs AI workflows in production. That practitioner lens — understanding both the product "why" and the technical "how" — is what defines his approach.
 
+## Personal
+
+Roman lives in the Copenhagen area of Denmark with his wife and two kids.
+
 ## Education
 
 - MSc. Technology-based Business Development — Aarhus University, Denmark (2012–2014)
