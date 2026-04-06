@@ -41,7 +41,7 @@ keywords: ["skills", "technical", "AI", "tools", "capabilities", "stack", "techn
 1. **Practitioner + strategist:** Doesn't just plan AI products — builds them. Writes prompts, designs architectures, deploys to production.
 2. **Manufacturing lens:** 10+ years in industrial engineering (LEGO, JENSEN) brings quality discipline and process thinking to AI product work.
 3. **Full-stack product thinking:** From user research to prompt architecture to deployment — can own the entire product lifecycle.
-4. **Speed of execution:** Built 7 production tools in 2 weeks for a single interview (Ghost Creator Suite).
+4. **Speed of execution:** Built 7 production tools in 2 weeks to explore Ghost's product domain (Ghost Creator Suite).
 
 ## Key Takeaways
 

@@ -19,11 +19,11 @@ const FOLLOW_UPS = [
   [
     { icon: '\u25C8', text: 'How does he approach PM?', question: 'How does Roman approach product management?' },
     { icon: '\u2605', text: 'What has he shipped?', question: 'What products has Roman shipped to real customers?' },
-    { icon: '\u2794', text: 'Why hire Roman?', question: 'Why should we hire Roman for an AI product role?' },
+    { icon: '\u2794', text: 'What sets him apart?', question: 'What makes Roman unique as a product leader?' },
   ],
   [
     { icon: '\u25B7', text: 'Tell me about the scoping tool', question: 'Walk me through the AI Implementation Scoping Tool case study' },
-    { icon: '\u2726', text: 'What makes him different?', question: 'What makes Roman different from other PM candidates?' },
+    { icon: '\u2726', text: 'How does he think about AI?', question: 'How does Roman think about building AI products?' },
     { icon: '\u2699', text: 'What is his background?', question: 'What is Roman\'s career background and education?' },
   ],
   [

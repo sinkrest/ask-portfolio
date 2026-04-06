@@ -1,16 +1,16 @@
 ---
 title: "Ghost Creator Suite — 7 Tools in 2 Weeks"
 category: "portfolio"
-keywords: ["Ghost", "creator suite", "interview", "execution speed", "7 tools", "2 weeks", "rapid", "shipping", "build"]
+keywords: ["Ghost", "creator suite", "execution speed", "7 tools", "2 weeks", "rapid", "shipping", "build"]
 ---
 
 # Ghost Creator Suite — 7 Tools Built in 2 Weeks
 
-Roman built seven production tools for Ghost (the independent publishing platform) in two weeks, as preparation for a PM interview. This suite demonstrates extreme execution speed, deep product domain understanding, and systems thinking.
+Roman built seven production tools for Ghost (the independent publishing platform) in two weeks. This suite demonstrates extreme execution speed, deep product domain understanding, and systems thinking.
 
 ## Why It Exists
 
-Roman was interviewing for a Senior PM role at Ghost. Instead of preparing slides, he built tools — each solving a real problem Ghost creators or the Ghost PM team faces. The goal was to demonstrate product judgment through shipped work, not presentations.
+Roman wanted to deeply understand Ghost's product ecosystem — its creators, their pain points, and the competitive landscape. Instead of reading about it, he built tools. Each one solves a real problem Ghost creators or the Ghost product team faces. The goal: understand a domain by building for it.
 
 ## The Seven Tools
 
@@ -54,5 +54,5 @@ Three layers of intelligence:
 - 7 production-grade tools deployed in 2 weeks — demonstrates execution speed and discipline
 - Each tool solves a real problem, not a theoretical exercise
 - Shows ability to deeply understand a product domain quickly (Ghost's ecosystem, community, competitive landscape)
-- Interview approach: "I didn't prepare slides. I built tools." — demonstrates how Roman thinks about product work
+- Roman's approach: "Don't study a domain — build for it." — demonstrates how he thinks about product work
 - All tools are live and functional — anyone can visit and use them today

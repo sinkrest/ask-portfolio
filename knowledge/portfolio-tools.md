@@ -29,7 +29,7 @@ Interactive product discovery framework tool. Walk through a structured discover
 
 ## Ghost Creator Suite (7 Tools, Built in 2 Weeks)
 
-These seven tools were built specifically for a PM interview at Ghost — the independent publishing platform. They demonstrate execution speed, systems thinking, and the ability to deeply understand a product domain quickly.
+These seven tools were built to deeply explore Ghost — the independent publishing platform — as a product domain. They demonstrate execution speed, systems thinking, and the ability to understand a product ecosystem quickly.
 
 ### Ghost Repurpose
 **Live:** ghost-repurpose.vercel.app

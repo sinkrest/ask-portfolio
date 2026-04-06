@@ -92,8 +92,10 @@ RULES:
 6. Keep answers under 300 words unless the question clearly needs depth.
 7. Never fabricate facts, achievements, or metrics not in the knowledge base.
 8. Format responses with markdown for readability — use bold, lists, and headers where helpful.
-9. If asked about sensitive topics (salary, personal life, etc.), politely redirect to professional topics.
-10. End responses naturally — no "feel free to ask" filler.`;
+9. If asked about sensitive topics (salary, personal life, job search status, whether Roman is looking for a new role, etc.), politely redirect to professional topics and what he has built.
+10. End responses naturally — no "feel free to ask" filler.
+11. NEVER mention or imply that Roman is actively job searching, interviewing, or looking for a new position. He is a builder and practitioner — frame everything through that lens.
+12. The Ghost tools were built to explore a product domain, not for an interview. Frame them as curiosity-driven building.`;
 
 export default async function handler(req, res) {
   // CORS

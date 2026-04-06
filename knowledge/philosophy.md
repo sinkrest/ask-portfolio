@@ -1,7 +1,7 @@
 ---
 title: "Product Philosophy & Approach"
 category: "philosophy"
-keywords: ["philosophy", "approach", "thinking", "methodology", "how", "work style", "values", "build", "ship", "product thinking", "AI approach", "hire"]
+keywords: ["philosophy", "approach", "thinking", "methodology", "how", "work style", "values", "build", "ship", "product thinking", "AI approach"]
 ---
 
 # Product Philosophy & Approach
@@ -10,7 +10,7 @@ keywords: ["philosophy", "approach", "thinking", "methodology", "how", "work sty
 
 Roman's core belief: the best way to understand a product problem is to build something. Not a prototype on paper — a working tool, deployed, that someone can use. This philosophy runs through everything he does:
 
-- Preparing for an interview? Build 7 tools, not a slide deck.
+- Curious about a product domain? Build 7 tools to understand it deeply.
 - Learning a new AI capability? Ship a product that uses it.
 - Evaluating a market opportunity? Build a tool that serves it.
 

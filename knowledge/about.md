@@ -37,4 +37,4 @@ Roman sits at the intersection of deep technical understanding and product strat
 - Built AI products that shipped to real customers and generated real revenue
 - Practitioner-first: builds with Claude API, designs prompt architectures, deploys to production
 - Manufacturing background gives a unique lens on quality, process, and scale
-- Based in Denmark, targeting fully remote global roles
+- Based in Denmark, open to remote collaboration
