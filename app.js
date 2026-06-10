@@ -8,13 +8,25 @@ const state = {
   hasStarted: false,
   sources: [],         // Knowledge base metadata
   theme: localStorage.getItem('amp-theme') || 'dark',
+  stickToBottom: true, // Whether to auto-scroll — disabled if user scrolls up
 };
+
+// Threshold (px) — if the user is within this distance from the bottom,
+// we consider them "at the bottom" and keep auto-scrolling. Otherwise we leave
+// their scroll position alone so they can read earlier content while streaming.
+const STICK_THRESHOLD = 220;
+
+// Time-based throttle for streamed markdown re-parses. Haiku emits tokens much
+// faster than the eye can follow; 60fps re-parses look "rushed" and jittery.
+// ~120ms (~8fps) is a calm reading cadence — text still feels live, but each
+// frame has settled before the next one replaces it.
+const STREAM_RENDER_INTERVAL_MS = 120;
 
 const FOLLOW_UPS = [
   [
-    { icon: '\u25B7', text: 'Tell me about the Ghost Creator Suite', question: 'Tell me about the Ghost Creator Suite — 7 tools in 2 weeks' },
-    { icon: '\u2726', text: 'Walk me through a case study', question: 'Walk me through the AI children\'s book case study' },
-    { icon: '\u2699', text: 'What are his AI skills?', question: 'What are Roman\'s AI and technical skills?' },
+    { icon: '\u25B7', text: 'The Forkable Factory thesis', question: 'What is the Forkable Factory and why does Roman believe physical products should be developed like software?' },
+    { icon: '\u2726', text: 'AI workflows inside an OEM', question: 'What AI-assisted workflows has Roman deployed inside an industrial company?' },
+    { icon: '\u2699', text: 'His AI + technical skills', question: 'What are Roman\'s AI and technical skills?' },
   ],
   [
     { icon: '\u25C8', text: 'How does he approach PM?', question: 'How does Roman approach product management?' },
@@ -22,12 +34,12 @@ const FOLLOW_UPS = [
     { icon: '\u2794', text: 'What sets him apart?', question: 'What makes Roman unique as a product leader?' },
   ],
   [
-    { icon: '\u25B7', text: 'Tell me about the scoping tool', question: 'Walk me through the AI Implementation Scoping Tool case study' },
+    { icon: '\u25B7', text: 'The Scoping Tool', question: 'Walk me through the AI Implementation Scoping Tool case study' },
     { icon: '\u2726', text: 'How does he think about AI?', question: 'How does Roman think about building AI products?' },
-    { icon: '\u2699', text: 'What is his background?', question: 'What is Roman\'s career background and education?' },
+    { icon: '\u2699', text: 'Career arc — factory to AI', question: 'Walk me through Roman\'s career arc from LEGO polymer technician apprentice to AI product leader' },
   ],
   [
-    { icon: '\u25C8', text: 'Ghost PM Signal case study', question: 'Tell me about the Ghost PM Signal dashboard — how does it work?' },
+    { icon: '\u25C8', text: 'Product Signal case study', question: 'Tell me about the Product Signal dashboard — how does it work?' },
     { icon: '\u2605', text: 'His product philosophy', question: 'What is Roman\'s product philosophy and working style?' },
     { icon: '\u2794', text: 'Manufacturing + AI?', question: 'How does Roman\'s manufacturing background help in AI product work?' },
   ],
@@ -41,6 +53,7 @@ const inputTextarea = document.getElementById('inputTextarea');
 const sendBtn = document.getElementById('sendBtn');
 const themeToggle = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
+const newChatBtn = document.getElementById('newChatBtn');
 const infoBtn = document.getElementById('infoBtn');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
@@ -96,6 +109,14 @@ function setupListeners() {
 
   inputTextarea.addEventListener('input', () => autoResize());
 
+  // Detach auto-scroll if the user scrolls up while streaming — lets them
+  // read earlier content without the page yanking them back to the bottom.
+  window.addEventListener('scroll', () => {
+    if (!state.isStreaming) return;
+    const distanceFromBottom = document.body.scrollHeight - (window.scrollY + window.innerHeight);
+    state.stickToBottom = distanceFromBottom < STICK_THRESHOLD;
+  }, { passive: true });
+
   // Suggested questions (initial)
   document.querySelectorAll('.suggestion-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -107,6 +128,8 @@ function setupListeners() {
   themeToggle.addEventListener('click', () => {
     applyTheme(state.theme === 'dark' ? 'light' : 'dark');
   });
+
+  newChatBtn.addEventListener('click', () => resetChat());
 
   infoBtn.addEventListener('click', () => modalOverlay.classList.add('visible'));
   modalClose.addEventListener('click', () => modalOverlay.classList.remove('visible'));
@@ -126,9 +149,26 @@ function handleSend() {
   sendMessage(text);
 }
 
+// Soft reset back to the landing state — no page reload needed.
+function resetChat() {
+  if (state.isStreaming) return;
+  state.messages = [];
+  state.hasStarted = false;
+  state.stickToBottom = true;
+  messagesEl.innerHTML = '';
+  hero.classList.remove('collapsed');
+  suggestions.classList.remove('hidden');
+  newChatBtn.classList.remove('visible');
+  inputTextarea.value = '';
+  inputTextarea.style.height = 'auto';
+  window.scrollTo({ top: 0 });
+  inputTextarea.focus();
+}
+
 // --- Core Chat Logic ---
 async function sendMessage(text) {
   state.isStreaming = true;
+  state.stickToBottom = true;
   sendBtn.disabled = true;
 
   // Remove any existing follow-up chips
@@ -141,6 +181,7 @@ async function sendMessage(text) {
     const heroHeight = hero.offsetHeight + suggestions.offsetHeight;
     hero.classList.add('collapsed');
     suggestions.classList.add('hidden');
+    newChatBtn.classList.add('visible');
     // Compensate: shift scroll up by the height removed
     window.scrollTo(0, Math.max(0, scrollY - heroHeight));
   }
@@ -211,11 +252,11 @@ async function sendMessage(text) {
               assistantEl = createAssistantMessage();
             }
             fullText += event.text;
-            renderAssistantContent(assistantEl, fullText);
-            scrollToBottom();
+            scheduleStreamingRender(assistantEl, () => fullText);
           }
 
           if (event.type === 'done') {
+            flushStreamingRender(assistantEl, fullText);
             if (assistantEl && sourceMeta.length > 0) {
               renderSourceCards(assistantEl, sourceMeta, fullText);
             }
@@ -235,9 +276,10 @@ async function sendMessage(text) {
           const event = JSON.parse(remaining.slice(6).trim());
           if (event.type === 'text' && assistantEl) {
             fullText += event.text;
-            renderAssistantContent(assistantEl, fullText);
+            scheduleStreamingRender(assistantEl, () => fullText);
           }
           if (event.type === 'done') {
+            flushStreamingRender(assistantEl, fullText);
             if (assistantEl && sourceMeta.length > 0) {
               renderSourceCards(assistantEl, sourceMeta, fullText);
             }
@@ -251,6 +293,7 @@ async function sendMessage(text) {
 
     // Safety: if assistant text was received but 'done' event was missed, still save it
     if (fullText && !state.messages.find(m => m.content === fullText && m.role === 'assistant')) {
+      flushStreamingRender(assistantEl, fullText);
       if (assistantEl && sourceMeta.length > 0) {
         renderSourceCards(assistantEl, sourceMeta, fullText);
       }
@@ -338,12 +381,12 @@ const SOURCE_QUESTIONS = {
   'Professional Experience': 'Walk me through Roman\'s professional experience in detail',
   'Skills & Technical Capabilities': 'What are Roman\'s strongest technical and PM skills?',
   'Portfolio — Live Deployed Tools': 'Show me the full list of tools Roman has built',
-  'Ghost Creator Suite — 7 Tools in 2 Weeks': 'Tell me the story behind the Ghost Creator Suite',
+  'Publishing Suite — Tools for Creator Platforms': 'Tell me the story behind the Publishing Suite',
   'Product Philosophy & Approach': 'How does Roman approach product management and AI?',
   'Thought Leadership & Writing': 'What does Roman write about and what are his key insights?',
   'Case Study — AI Children\'s Book Platform': 'Walk me through the AI children\'s book case study',
   'Case Study — AI Implementation Scoping Tool': 'Tell me about the AI Scoping Tool and its prompt architecture',
-  'Case Study — Ghost PM Signal': 'How does Ghost PM Signal work and what problem does it solve?',
+  'Case Study — Product Signal': 'How does Product Signal work and what problem does it solve?',
 };
 
 function renderSourceCards(el, sources, fullText) {
@@ -409,16 +452,60 @@ function renderErrorMessage(text) {
 function showTyping() {
   const div = document.createElement('div');
   div.className = 'typing';
-  div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  div.innerHTML = '<div class="jarvi-msg-avatar">J</div><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div><span class="typing-label">thinking</span>';
   messagesEl.appendChild(div);
   scrollToBottom();
   return div;
 }
 
-function scrollToBottom() {
+// Gentle auto-scroll. Only nudges when content has actually overflowed the
+// viewport, and only while the user hasn't scrolled away. No smooth-scroll
+// during streaming — overlapping animations were the source of the old jump.
+let scrollPending = false;
+function scrollToBottom(options = {}) {
+  const { smooth = false, force = false } = options;
+  if (!force && state.isStreaming && !state.stickToBottom) return;
+  if (scrollPending) return;
+  scrollPending = true;
   requestAnimationFrame(() => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    scrollPending = false;
+    const doc = document.documentElement;
+    const maxScroll = doc.scrollHeight - window.innerHeight;
+    if (window.scrollY >= maxScroll - 2) return; // already there
+    window.scrollTo({
+      top: maxScroll,
+      behavior: smooth ? 'smooth' : 'auto',
+    });
   });
+}
+
+// Time-throttled streaming render. Streamed chunks arrive faster than the eye
+// can follow — rendering every chunk (or every rAF) looks rushed and causes
+// layout thrash. A ~120ms floor between renders lets each paragraph settle
+// before the next chunk overwrites it, which reads much calmer.
+let streamTimer = null;
+let lastStreamRender = 0;
+function scheduleStreamingRender(el, getText) {
+  if (!el) return;
+  if (streamTimer !== null) return;
+  const elapsed = performance.now() - lastStreamRender;
+  const wait = Math.max(0, STREAM_RENDER_INTERVAL_MS - elapsed);
+  streamTimer = setTimeout(() => {
+    streamTimer = null;
+    lastStreamRender = performance.now();
+    renderAssistantContent(el, getText());
+    scrollToBottom();
+  }, wait);
+}
+
+function flushStreamingRender(el, text) {
+  if (streamTimer !== null) {
+    clearTimeout(streamTimer);
+    streamTimer = null;
+  }
+  lastStreamRender = performance.now();
+  if (el) renderAssistantContent(el, text);
+  scrollToBottom();
 }
 
 function escapeHtml(str) {
