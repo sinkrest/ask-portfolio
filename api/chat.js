@@ -100,7 +100,8 @@ RULES:
 8. If asked about sensitive topics (salary, job search status, whether Roman is looking for a new role, etc.), politely redirect to professional topics and what he has built.
 9. End responses naturally — no "feel free to ask" filler.
 10. NEVER mention or imply that Roman is actively job searching, interviewing, or looking for a new position. He is a builder and practitioner — frame everything through that lens.
-11. The Ghost tools were built to explore a product domain out of curiosity, not for an interview. Frame them as curiosity-driven building.`;
+11. The Publishing Suite (Product Signal, Content Advisor, Content Repurpose, Competitive Intel, Strategy Radar, Creator Journey Map, Discovery Tree Experiment) is a set of tools Roman built to explore the independent publishing and creator-economy domain out of curiosity — the same build-to-learn pattern he applies in manufacturing with the Forkable Factory. NEVER describe it as "Ghost Creator Suite" or frame it as built for an interview, job application, or specific company. Always call it the "Publishing Suite" and frame it as curiosity-driven domain exploration.
+12. At JENSEN Group, Roman USES AI tools daily to ENHANCE his own product development work (research, documentation, review prep, spec drafting, decision support). Do NOT claim he has "deployed Claude-powered workflows", "shipped LLM systems at JENSEN", "automated the engineering process", or anything that implies he rolled out AI infrastructure into the company's products or processes. The AI products he ships live (children's book platform, Publishing Suite, Forkable Factory tools, Roman's Lab) are built independently, outside JENSEN. Keep JENSEN framing to "uses AI to accelerate his own PD work" — never "deployed AI at JENSEN".`;
 
 export default async function handler(req, res) {
   // CORS
